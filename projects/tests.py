@@ -49,13 +49,13 @@ class ProjectAPITests(APITestCase):
         self.project_data = {
             'name': 'API Test Project',
             'description': 'API Test Description',
-            'start_date': timezone.now().date(),
-            'end_date': timezone.now().date(),
+            'start_date': timezone.now().date().isoformat(),
+            'end_date': timezone.now().date().isoformat(),
             'status': Project.STATUS_ACTIVE
         }
 
     def test_create_project(self):
-        response = self.client.post('/api/projects/', self.project_data)
+        response = self.client.post('/api/projects/', self.project_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Project.objects.count(), 1)
         self.assertEqual(Project.objects.get().name, 'API Test Project')
