@@ -10,6 +10,48 @@ class ProjectModelTests(TestCase, TestCaseWithSetup):
         self.user = self.create_test_user()
         self.project = self.create_test_project(self.user)
 
+    def test_project_status_choices(self):
+        self.project.status = Project.STATUS_ACTIVE
+        self.project.save()
+        self.assertEqual(self.project.status, Project.STATUS_ACTIVE)
+
+        self.project.status = Project.STATUS_COMPLETED
+        self.project.save()
+        self.assertEqual(self.project.status, Project.STATUS_COMPLETED)
+
+        self.project.status = Project.STATUS_ON_HOLD
+        self.project.save()
+        self.assertEqual(self.project.status, Project.STATUS_ON_HOLD)
+
+    def test_project_dates(self):
+        start_date = timezone.now().date()
+        end_date = start_date + timezone.timedelta(days=30)
+        self.project.start_date = start_date
+        self.project.end_date = end_date
+        self.project.save()
+        
+        self.assertEqual(self.project.start_date, start_date)
+        self.assertEqual(self.project.end_date, end_date)
+
+    def test_project_member_uniqueness(self):
+        ProjectMember.objects.create(
+            project=self.project,
+            user=self.user
+        )
+        with self.assertRaises(IntegrityError):
+            ProjectMember.objects.create(
+                project=self.project,
+                user=self.user
+            )
+
+    def test_project_member_string_representation(self):
+        member = ProjectMember.objects.create(
+            project=self.project,
+            user=self.user
+        )
+        expected_str = f"{self.user.username} - {self.project.name}"
+        self.assertEqual(str(member), expected_str)
+
     def test_project_creation(self):
         self.assertEqual(self.project.name, 'Test Project')
         self.assertEqual(self.project.created_by, self.user)

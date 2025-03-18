@@ -17,6 +17,86 @@ class TaskModelTests(TestCase, TestCaseWithSetup):
             due_date=timezone.now()
         )
 
+    def test_task_priority_choices(self):
+        self.task.priority = Task.PRIORITY_HIGH
+        self.task.save()
+        self.assertEqual(self.task.priority, Task.PRIORITY_HIGH)
+
+        self.task.priority = Task.PRIORITY_MEDIUM
+        self.task.save()
+        self.assertEqual(self.task.priority, Task.PRIORITY_MEDIUM)
+
+        self.task.priority = Task.PRIORITY_LOW
+        self.task.save()
+        self.assertEqual(self.task.priority, Task.PRIORITY_LOW)
+
+    def test_task_status_choices(self):
+        self.task.status = Task.STATUS_TODO
+        self.task.save()
+        self.assertEqual(self.task.status, Task.STATUS_TODO)
+
+        self.task.status = Task.STATUS_IN_PROGRESS
+        self.task.save()
+        self.assertEqual(self.task.status, Task.STATUS_IN_PROGRESS)
+
+        self.task.status = Task.STATUS_COMPLETED
+        self.task.save()
+        self.assertEqual(self.task.status, Task.STATUS_COMPLETED)
+
+    def test_task_assignment(self):
+        new_user = User.objects.create_user(
+            username='assignee',
+            password='testpass123'
+        )
+        self.task.assigned_to = new_user
+        self.task.save()
+        self.assertEqual(self.task.assigned_to, new_user)
+
+    def test_task_attachment(self):
+        attachment = TaskAttachment.objects.create(
+            task=self.task,
+            file='test.txt',
+            uploaded_by=self.user
+        )
+        self.assertEqual(
+            str(attachment),
+            f"Attachment for {self.task.title}"
+        )
+        self.assertEqual(attachment.uploaded_by, self.user)
+
+    def test_task_comment(self):
+        comment = TaskComment.objects.create(
+            task=self.task,
+            author=self.user,
+            content='Test comment content'
+        )
+        self.assertEqual(comment.content, 'Test comment content')
+        self.assertEqual(comment.author, self.user)
+        self.assertEqual(
+            str(comment),
+            f"Comment by {self.user.username} on {self.task.title}"
+        )
+
+    def test_task_history(self):
+        new_user = User.objects.create_user(
+            username='new_assignee',
+            password='testpass123'
+        )
+        history = TaskHistory.objects.create(
+            task=self.task,
+            changed_by=self.user,
+            old_status=Task.STATUS_TODO,
+            new_status=Task.STATUS_IN_PROGRESS,
+            old_assigned_to=self.user,
+            new_assigned_to=new_user,
+            notes='Status and assignee changed'
+        )
+        self.assertEqual(history.old_status, Task.STATUS_TODO)
+        self.assertEqual(history.new_status, Task.STATUS_IN_PROGRESS)
+        self.assertEqual(history.old_assigned_to, self.user)
+        self.assertEqual(history.new_assigned_to, new_user)
+        self.assertEqual(history.notes, 'Status and assignee changed')
+
     def test_task_creation(self):
         self.assertEqual(self.task.title, 'Test Task')
         self.assertEqual(self.task.created_by, self.user)

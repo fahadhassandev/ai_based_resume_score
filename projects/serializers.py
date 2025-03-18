@@ -16,7 +16,6 @@ class ProjectSerializer(serializers.ModelSerializer):
     members = ProjectMemberSerializer(many=True, read_only=True)
     created_by_name = serializers.CharField(source='created_by.username', read_only=True)
     total_tasks = serializers.IntegerField(read_only=True, required=False)
-
     class Meta:
         model = Project
         fields = [
