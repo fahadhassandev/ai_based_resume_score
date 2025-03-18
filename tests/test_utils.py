@@ -5,9 +5,9 @@ from projects.models import Project
 User = get_user_model()
 
 class TestCaseWithSetup:
-    def create_test_user(self):
+    def create_test_user(self, username='testuser'):
         return User.objects.create_user(
-            username='testuser',
+            username=username,
             password='testpass123'
         )
 

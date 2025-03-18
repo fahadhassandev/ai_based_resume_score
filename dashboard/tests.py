@@ -7,8 +7,8 @@ from projects.models import Project
 
 class DashboardAPITests(APITestCase, TestCaseWithSetup):
     def setUp(self):
-        self.user = self.create_test_user()
-        self.other_user = self.create_test_user(username='testuser2')
+        self.user = self.create_test_user('testuser1')
+        self.other_user = self.create_test_user('testuser2')
         self.client.force_authenticate(user=self.user)
         self.project = self.create_test_project(self.user)
         self.create_test_tasks()
@@ -16,7 +16,7 @@ class DashboardAPITests(APITestCase, TestCaseWithSetup):
     def create_test_tasks(self):
         statuses = [Task.STATUS_TODO, Task.STATUS_IN_PROGRESS, Task.STATUS_COMPLETED]
         priorities = [Task.PRIORITY_HIGH, Task.PRIORITY_MEDIUM, Task.PRIORITY_LOW]
-        
+
         for task_status in statuses:
             for priority in priorities:
                 Task.objects.create(
@@ -82,8 +82,8 @@ class DashboardAPITests(APITestCase, TestCaseWithSetup):
         response = self.client.get('/api/dashboard/')
         recent_tasks = response.data['recent_tasks']
         self.assertLessEqual(len(recent_tasks), 5)
-        
-        # Verify tasks are ordered by updated_at
+
+        # Verify tasks are ordered by updated_a
         dates = [task['due_date'] for task in recent_tasks]
         self.assertEqual(dates, sorted(dates, reverse=True))
 
@@ -99,7 +99,7 @@ class DashboardAPITests(APITestCase, TestCaseWithSetup):
             priority=Task.PRIORITY_HIGH,
             due_date=timezone.now()
         )
-        
+
         response = self.client.get('/api/dashboard/')
         task_titles = [
             task['title'] for task in response.data['recent_tasks']
