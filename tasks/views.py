@@ -1,12 +1,30 @@
-from django.db.models import Q
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status as http_status
-from .models import Task, TaskHistory
-from .serializers import TaskSerializer, TaskHistorySerializer
+from django.db.models import Q
+from .models import Task, TaskHistory, TaskAttachment, TaskComment
+from .serializers import (
+    TaskSerializer, 
+    TaskHistorySerializer, 
+    TaskAttachmentSerializer, 
+    TaskCommentSerializer
+)
 
 class TaskViewSet(viewsets.ModelViewSet):
+    serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        return Task.objects.filter(
+            Q(created_by=self.request.user) | 
+            Q(assigned_to=self.request.user) |
+            Q(project__members__user=self.request.user)
+        ).distinct()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
     def perform_update(self, serializer):
         task = self.get_object()
         old_status = task.status
