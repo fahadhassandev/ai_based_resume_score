@@ -5,7 +5,6 @@ django-settings-module=task_management.settings
 [MESSAGES CONTROL]
 disable=C0111,  # missing-docstring
         C0103,  # invalid-name
-        C0330,  # bad-continuation
         R0903,  # too-few-public-methods
         R0901,  # too-many-ancestors
         W0223,  # abstract-method
@@ -24,3 +23,4 @@ min-similarity-lines=6
 ignore-comments=yes
 ignore-docstrings=yes
 ignore-imports=yes
+ignore=migrations
