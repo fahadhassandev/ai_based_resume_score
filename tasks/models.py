@@ -59,3 +59,27 @@ class TaskComment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.author.username} on {self.task.title}"
+
+
+class TaskHistory(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='history')
+    changed_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    old_status = models.CharField(max_length=20, choices=Task.STATUS_CHOICES, null=True)
+    new_status = models.CharField(max_length=20, choices=Task.STATUS_CHOICES)
+    old_assigned_to = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        related_name='old_task_assignments'
+    )
+    new_assigned_to = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        related_name='new_task_assignments'
+    )
+    changed_at = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Task {self.task.title} history - {self.changed_at}"

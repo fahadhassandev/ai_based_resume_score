@@ -29,3 +29,23 @@ class TaskSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at', 'attachments', 'comments'
         ]
         read_only_fields = ['created_by']
+
+class TaskHistorySerializer(serializers.ModelSerializer):
+    changed_by_name = serializers.CharField(source='changed_by.username', read_only=True)
+    old_assigned_to_name = serializers.CharField(
+        source='old_assigned_to.username', 
+        read_only=True
+    )
+    new_assigned_to_name = serializers.CharField(
+        source='new_assigned_to.username', 
+        read_only=True
+    )
+
+    class Meta:
+        model = TaskHistory
+        fields = [
+            'id', 'changed_by', 'changed_by_name', 'old_status', 'new_status',
+            'old_assigned_to', 'old_assigned_to_name', 'new_assigned_to',
+            'new_assigned_to_name', 'changed_at', 'notes'
+        ]
+        read_only_fields = ['changed_by']
