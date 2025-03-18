@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Task, TaskAttachment, TaskComment
+from .models import Task, TaskAttachment, TaskComment, TaskHistory
 
 class TaskAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
