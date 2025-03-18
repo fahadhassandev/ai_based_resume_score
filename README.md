@@ -17,6 +17,20 @@ I'll help you create a comprehensive plan for your Task Management System. Let m
 - Use JWT for secure authentication
 - Implement role-based access control (RBAC)
 
+task_management/
+├── venv/
+├── manage.py
+├── requirements.txt
+├── task_management/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── accounts/
+├── projects/
+├── tasks/
+└── dashboard/
+
 ## 2. Data/Resource Setup
 
 ### Database Schema
