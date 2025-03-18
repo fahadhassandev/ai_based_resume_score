@@ -1,27 +1,14 @@
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework.test import APITestCase
 from rest_framework import status
-from projects.models import Project
-from helpers import create_test_user, create_test_project
-from .models import Task, TaskComment, TaskAttachment, TaskHistory
+from tests.test_utils import TestCaseWithSetup
+from .models import Task, TaskComment, TaskHistory
 
-User = get_user_model()
-
-class TaskModelTests(TestCase):
+class TaskModelTests(TestCase, TestCaseWithSetup):
     def setUp(self):
-        self.user = User.objects.create_user(
-            username='testuser',
-            password='testpass123'
-        )
-        self.project = Project.objects.create(
-            name='Test Project',
-            description='Test Description',
-            start_date=timezone.now().date(),
-            end_date=timezone.now().date(),
-            created_by=self.user
-        )
+        self.user = self.create_test_user()
+        self.project = self.create_test_project(self.user)
         self.task = Task.objects.create(
             title='Test Task',
             description='Test Description',
@@ -56,20 +43,11 @@ class TaskModelTests(TestCase):
         self.assertEqual(history.old_status, Task.STATUS_TODO)
         self.assertEqual(history.new_status, Task.STATUS_IN_PROGRESS)
 
-class TaskAPITests(APITestCase):
+class TaskAPITests(APITestCase, TestCaseWithSetup):
     def setUp(self):
-        self.user = User.objects.create_user(
-            username='testuser',
-            password='testpass123'
-        )
+        self.user = self.create_test_user()
         self.client.force_authenticate(user=self.user)
-        self.project = Project.objects.create(
-            name='Test Project',
-            description='Test Description',
-            start_date=timezone.now().date(),
-            end_date=timezone.now().date(),
-            created_by=self.user
-        )
+        self.project = self.create_test_project(self.user)
         self.task_data = {
             'title': 'API Test Task',
             'description': 'API Test Description',

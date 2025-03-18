@@ -1,25 +1,14 @@
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework.test import APITestCase
 from rest_framework import status
+from tests.test_utils import TestCaseWithSetup
 from .models import Project, ProjectMember
 
-User = get_user_model()
-
-class ProjectModelTests(TestCase):
+class ProjectModelTests(TestCase, TestCaseWithSetup):
     def setUp(self):
-        self.user = User.objects.create_user(
-            username='testuser',
-            password='testpass123'
-        )
-        self.project = Project.objects.create(
-            name='Test Project',
-            description='Test Description',
-            start_date=timezone.now().date(),
-            end_date=timezone.now().date(),
-            created_by=self.user
-        )
+        self.user = self.create_test_user()
+        self.project = self.create_test_project(self.user)
 
     def test_project_creation(self):
         self.assertEqual(self.project.name, 'Test Project')
@@ -39,12 +28,9 @@ class ProjectModelTests(TestCase):
             ).exists()
         )
 
-class ProjectAPITests(APITestCase):
+class ProjectAPITests(APITestCase, TestCaseWithSetup):
     def setUp(self):
-        self.user = User.objects.create_user(
-            username='testuser',
-            password='testpass123'
-        )
+        self.user = self.create_test_user()
         self.client.force_authenticate(user=self.user)
         self.project_data = {
             'name': 'API Test Project',
@@ -61,13 +47,7 @@ class ProjectAPITests(APITestCase):
         self.assertEqual(Project.objects.get().name, 'API Test Project')
 
     def test_list_projects(self):
-        Project.objects.create(
-            name='Test Project',
-            description='Test Description',
-            start_date=timezone.now().date(),
-            end_date=timezone.now().date(),
-            created_by=self.user
-        )
+        self.create_test_project(self.user)
         response = self.client.get('/api/projects/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
