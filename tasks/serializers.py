@@ -33,11 +33,11 @@ class TaskSerializer(serializers.ModelSerializer):
 class TaskHistorySerializer(serializers.ModelSerializer):
     changed_by_name = serializers.CharField(source='changed_by.username', read_only=True)
     old_assigned_to_name = serializers.CharField(
-        source='old_assigned_to.username', 
+        source='old_assigned_to.username',
         read_only=True
     )
     new_assigned_to_name = serializers.CharField(
-        source='new_assigned_to.username', 
+        source='new_assigned_to.username',
         read_only=True
     )
 

@@ -67,19 +67,16 @@ class TaskHistory(models.Model):
     old_status = models.CharField(max_length=20, choices=Task.STATUS_CHOICES, null=True)
     new_status = models.CharField(max_length=20, choices=Task.STATUS_CHOICES)
     old_assigned_to = models.ForeignKey(
-        User, 
-        on_delete=models.SET_NULL, 
-        null=True, 
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
         related_name='old_task_assignments'
     )
     new_assigned_to = models.ForeignKey(
-        User, 
-        on_delete=models.SET_NULL, 
-        null=True, 
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
         related_name='new_task_assignments'
     )
     changed_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True)
-
-    def __str__(self):
-        return f"Task {self.task.title} history - {self.changed_at}"

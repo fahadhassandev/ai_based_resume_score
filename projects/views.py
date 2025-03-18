@@ -1,10 +1,13 @@
-from rest_framework import viewsets, permissions
+from django.db.models import Q, Count
+from django.contrib.auth import get_user_model
+from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import status
-from django.db.models import Count
+from tasks.models import Task
 from .models import Project, ProjectMember
-from .serializers import ProjectSerializer, ProjectMemberSerializer
+from .serializers import ProjectSerializer
+
+User = get_user_model()
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
@@ -24,7 +27,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def add_member(self, request, *args, **kwargs):
         project = self.get_object()
         user_id = request.data.get('user_id')
-        
         try:
             user = User.objects.get(id=user_id)
             ProjectMember.objects.create(project=project, user=user)
@@ -46,7 +48,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
             'in_progress_tasks': project.tasks.filter(
                 status=Task.STATUS_IN_PROGRESS
             ).count(),
-            'todo_tasks': project.tasks.filter(status=Task.STATUS_TODO).count(),
+            'todo_tasks': project.tasks.filter(
+                status=Task.STATUS_TODO
+            ).count(),
             'team_members': project.members.count()
         }
         return Response(stats)
